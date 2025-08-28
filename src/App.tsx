@@ -6,6 +6,9 @@ import { Button } from './components/ui/Button'
 import { Card } from './components/ui/Card'
 import { StatusPill } from './components/ui/StatusPill'
 import { ProductsTable } from './components/dashboard/ProductsTable'
+import { ProductDrawer } from './components/dashboard/Drawer'
+import type { ProductDrawerProps } from './types'
+import SupplySightDashboard from './components/Dashboard'
 
 
 function App() {
@@ -13,9 +16,8 @@ function App() {
 
   return (
     <>
-    <Card/>
-     <StatusPill status="Healthy"/>
-     <ProductsTable products={[]} getProductStatus={() => 'Healthy'} onRowClick={() => {}} currentPage={1} setCurrentPage={() => {}}/>
+
+    <SupplySightDashboard />
     </>
   )
 }
