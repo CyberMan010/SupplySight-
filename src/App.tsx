@@ -5,6 +5,7 @@ import './App.css'
 import { Button } from './components/ui/Button'
 import { Card } from './components/ui/Card'
 import { StatusPill } from './components/ui/StatusPill'
+import { ProductsTable } from './components/dashboard/ProductsTable'
 
 
 function App() {
@@ -14,6 +15,7 @@ function App() {
     <>
     <Card/>
      <StatusPill status="Healthy"/>
+     <ProductsTable products={[]} getProductStatus={() => 'Healthy'} onRowClick={() => {}} currentPage={1} setCurrentPage={() => {}}/>
     </>
   )
 }
