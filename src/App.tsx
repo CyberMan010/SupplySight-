@@ -4,6 +4,7 @@ import viteLogo from '/vite.svg'
 import './App.css'
 import ProductTable from './products'
 import { Button } from './components/ui/Button'
+import { Card } from './components/ui/Card'
 
 
 function App() {
@@ -11,8 +12,7 @@ function App() {
 
   return (
     <>
-    <ProductTable/>
-    <Button />
+    <Card/>
      
     </>
   )
