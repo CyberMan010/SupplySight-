@@ -3,15 +3,15 @@ import {
   InMemoryCache,
   createHttpLink,
   from,
-  DefaultOptions,
 } from '@apollo/client';
+import type { DefaultOptions } from '@apollo/client';
 import { onError } from '@apollo/client/link/error';
 import { setContext } from '@apollo/client/link/context';
 import { RetryLink } from '@apollo/client/link/retry';
 
 // Environment configuration
 const config = {
-  graphqlUri: process.env.REACT_APP_GRAPHQL_URI || 'http://localhost:4000',
+  graphqlUri: import.meta.env.VITE_GRAPHQL_URI || 'http://localhost:4000/',
   retryAttempts: 3,
   retryDelay: 1000,
 };
@@ -19,7 +19,7 @@ const config = {
 // HTTP link for GraphQL requests
 const httpLink = createHttpLink({
   uri: config.graphqlUri,
-  credentials: 'include',
+  credentials: 'same-origin',
 });
 
 // Auth link for adding authentication headers
@@ -81,34 +81,13 @@ const cache = new InMemoryCache({
     Query: {
       fields: {
         products: {
-          keyArgs: ['search', 'status', 'warehouse'],
-          merge(existing = [], incoming) {
+          merge(_, incoming) {
             return incoming;
-          },
-        },
-        kpis: {
-          keyArgs: ['range'],
-          merge(existing = [], incoming) {
-            return incoming;
-          },
-        },
-      },
-    },
-    Product: {
-      keyFields: ['id'],
-      fields: {
-        stock: {
-          merge: true,
-        },
-        demand: {
-          merge: true,
-        },
-      },
-    },
-    Warehouse: {
-      keyFields: ['code'],
-    },
-  },
+          }
+        }
+      }
+    }
+  }
 });
 
 // Default options for queries and mutations
@@ -128,24 +107,28 @@ const defaultOptions: DefaultOptions = {
 };
 
 // Create Apollo Client instance
-export const apolloClient = new ApolloClient({
-  link: from([
-    errorLink,
-    retryLink,
-    authLink,
-    httpLink,
-  ]),
+export const client = new ApolloClient({
+  link: httpLink,
   cache,
-  defaultOptions,
-  connectToDevTools: process.env.NODE_ENV === 'development',
+  defaultOptions: {
+    watchQuery: {
+      fetchPolicy: 'network-only',
+      errorPolicy: 'all'
+    },
+    query: {
+      fetchPolicy: 'network-only',
+      errorPolicy: 'all'
+    }
+  },
+  connectToDevTools: true
 });
 
 // Helper function to clear cache
 export const clearCache = () => {
-  apolloClient.clearStore();
+  client.clearStore();
 };
 
 // Helper function to refetch all queries
 export const refetchQueries = () => {
-  apolloClient.refetchQueries({ include: 'active' });
+  client.refetchQueries({ include: 'active' });
 };
