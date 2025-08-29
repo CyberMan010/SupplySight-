@@ -105,6 +105,8 @@ export interface ProductsTableProps {
 export interface ProductDrawerProps {
   product: Product;
   onClose: () => void;
+  onUpdateDemand: (id: string, demand: number) => Promise<void>;
+  onTransferStock: (id: string, from: string, to: string, qty: number) => Promise<void>;
 }
 
 export interface DateRangeSelectorProps {

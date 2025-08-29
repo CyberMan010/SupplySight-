@@ -9,7 +9,12 @@ import { formatNumber, formatPercentage } from '../../utils/formatters';
 
 type DrawerTab = 'details' | 'demand' | 'transfer';
 
-export const ProductDrawer: React.FC<ProductDrawerProps> = ({ product, onClose }) => {
+export const ProductDrawer: React.FC<ProductDrawerProps> = ({ 
+  product, 
+  onClose,
+  onUpdateDemand,
+  onTransferStock
+}) => {
   const [activeTab, setActiveTab] = useState<DrawerTab>('details');
   const [isClosing, setIsClosing] = useState(false);
   const [updateDemandForm, setUpdateDemandForm] = useState<UpdateDemandForm>({
@@ -29,7 +34,7 @@ export const ProductDrawer: React.FC<ProductDrawerProps> = ({ product, onClose }
   };
 
 
-  const handleUpdateDemand = (e: React.FormEvent) => {
+  const handleUpdateDemand = async (e: React.FormEvent) => {
     e.preventDefault();
     const validationErrors = validateUpdateDemand(updateDemandForm);
     
@@ -43,12 +48,14 @@ export const ProductDrawer: React.FC<ProductDrawerProps> = ({ product, onClose }
     }
     
     setErrors({});
-    // Simulate mutation
-    console.log('Update demand:', product.id, updateDemandForm.demand);
-    alert(`Demand updated to ${updateDemandForm.demand} for ${product.name}`);
+    try {
+      await onUpdateDemand(product.id, updateDemandForm.demand);
+    } catch (error) {
+      setErrors({ demand: 'Failed to update demand. Please try again.' });
+    }
   };
 
-  const handleTransferStock = (e: React.FormEvent) => {
+  const handleTransferStock = async (e: React.FormEvent) => {
     e.preventDefault();
     const validationErrors = validateTransferStock(transferStockForm, product);
     
@@ -62,9 +69,16 @@ export const ProductDrawer: React.FC<ProductDrawerProps> = ({ product, onClose }
     }
     
     setErrors({});
-    // Simulate mutation
-    console.log('Transfer stock:', product.id, transferStockForm.quantity, transferStockForm.toWarehouse);
-    alert(`Transferred ${transferStockForm.quantity} units to ${transferStockForm.toWarehouse}`);
+    try {
+      await onTransferStock(
+        product.id, 
+        product.warehouse, 
+        transferStockForm.toWarehouse, 
+        transferStockForm.quantity
+      );
+    } catch (error) {
+      setErrors({ quantity: 'Failed to transfer stock. Please try again.' });
+    }
   };
 
   const utilizationPercentage = (product.demand / product.stock) * 100;

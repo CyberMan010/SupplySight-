@@ -14,6 +14,13 @@ import { Filters } from '../components/dashboard/Filters';
 import { ProductsTable } from '../components/dashboard/ProductsTable';
 import { ProductDrawer } from '../components/dashboard/Drawer';
 import { KPICardsSkeleton, ChartSkeleton, TableSkeleton } from './ui/Skeleton';
+import { useMutation, useQuery } from '@apollo/client/react';
+
+import { 
+  GET_PRODUCTS,
+  UPDATE_DEMAND_MUTATION,
+  TRANSFER_STOCK_MUTATION 
+} from '../graphql/queries';
 
 // Mock data generator for KPIs
 const generateKPIData = (range: DateRange): KPI[] => {
@@ -90,12 +97,60 @@ const SupplySightDashboard: React.FC = () => {
   const [range, setRange] = useState<DateRange>('7d');
   const [loading, setLoading] = useState<boolean>(false);
 
+  // GraphQL queries and mutations
+  const { loading: productsLoading, data: productsData, refetch } = useQuery(GET_PRODUCTS, {
+    variables: {
+      search: '',  // Initial empty search
+      status: 'All',  // Initial status
+      warehouse: 'All'  // Initial warehouse
+    }
+  });
+
+  const [updateDemand] = useMutation(UPDATE_DEMAND_MUTATION, {
+    onCompleted: () => {
+      refetch();
+      setSelectedProduct(null);
+    }
+  });
+
+  const [transferStock] = useMutation(TRANSFER_STOCK_MUTATION, {
+    onCompleted: () => {
+      refetch();
+      setSelectedProduct(null);
+    }
+  });
+
+  // Get products from query data
+  const products = productsData?.products || [];
+
+  // Use real data with filters
+  const filterHook = useDashboardFilters(products);
+
   // Custom hooks
-  const filterHook = useDashboardFilters(mockProducts);
   const { totalStock, totalDemand, fillRate, getProductStatus } = useInventoryLogic(filterHook.filteredProducts);
   
   // Generate KPI data based on selected range
   const kpiData = useMemo(() => generateKPIData(range), [range]);
+
+  const handleUpdateDemand = async (id: string, demand: number) => {
+    try {
+      await updateDemand({
+        variables: { id, demand }
+      });
+    } catch (error) {
+      console.error('Error updating demand:', error);
+    }
+  };
+
+  const handleTransferStock = async (id: string, from: string, to: string, qty: number) => {
+    try {
+      await transferStock({
+        variables: { id, from, to, qty }
+      });
+    } catch (error) {
+      console.error('Error transferring stock:', error);
+    }
+  };
 
   // Simulate loading for demo purposes
   const handleRangeChange = (newRange: DateRange) => {
@@ -107,6 +162,17 @@ const SupplySightDashboard: React.FC = () => {
       setLoading(false);
     }, 500);
   };
+
+  // Refetch when filters change
+  useEffect(() => {
+    refetch({
+      variables: {
+        search: filterHook.search,
+        status: filterHook.status,
+        warehouse: filterHook.warehouse
+      }
+    });
+  }, [filterHook.search, filterHook.status, filterHook.warehouse, refetch]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
@@ -186,13 +252,13 @@ const SupplySightDashboard: React.FC = () => {
         
         {/* Products Table */}
          <section className="rounded-2xl overflow-hidden">
-            {loading ? <TableSkeleton /> : (
+            {loading || productsLoading ? <TableSkeleton /> : (
               <ProductsTable
-                products={filterHook.filteredProducts}
-                getProductStatus={getProductStatus}
-                onRowClick={setSelectedProduct}
-                currentPage={filterHook.currentPage}
-                setCurrentPage={filterHook.setCurrentPage}
+                 products={filterHook.filteredProducts}
+                 getProductStatus={getProductStatus}
+                 onRowClick={setSelectedProduct}
+                 currentPage={filterHook.currentPage}
+                 setCurrentPage={filterHook.setCurrentPage}
               />
             )}
           </section>
@@ -203,7 +269,9 @@ const SupplySightDashboard: React.FC = () => {
        {selectedProduct && (
         <ProductDrawer 
           product={selectedProduct} 
-          onClose={() => setSelectedProduct(null)} 
+          onClose={() => setSelectedProduct(null)}
+          onUpdateDemand={handleUpdateDemand}
+          onTransferStock={handleTransferStock}
         />
       )}
 
