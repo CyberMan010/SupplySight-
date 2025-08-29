@@ -170,11 +170,11 @@ console.log('Data:', productsData);
   // Refetch when filters change
   useEffect(() => {
     refetch({
-      search: filterHook.search,
+
       status: filterHook.status,
       warehouse: filterHook.warehouse
     });
-  }, [filterHook.search, filterHook.status, filterHook.warehouse, refetch]);
+  }, [ filterHook.status, filterHook.warehouse, refetch]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
