@@ -1,10 +1,10 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Package } from 'lucide-react';
+import { BarChart3, Package, Settings } from 'lucide-react';
 import { 
   mockProducts,
   mockWarehouses
 } from '../types';
-import type { Product, Warehouse, KPI, FilterStatus, DateRange, DashboardState, } from '../types';
+import type { Product, KPI, FilterStatus, DateRange, } from '../types';
 import { useInventoryLogic } from '../hooks/useInventoryLogic';
 import { useDebounce } from '../hooks/useDebounce';
 import { DateRangeSelector } from '../components/dashboard/DateRangeSelector';
@@ -109,84 +109,115 @@ const SupplySightDashboard: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b backdrop-blur-sm bg-opacity-95 sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+      <header className="bg-white/80 backdrop-blur-lg border-b border-slate-200 sticky top-0 z-40">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center">
-                <Package className="w-5 h-5 text-white" />
+              <div className="w-10 h-10 bg-gradient-to-tr from-blue-600 to-indigo-500 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
+                <Package className="w-6 h-6 text-white" />
               </div>
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
-                SupplySight
-              </h1>
+              <div>
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-slate-800 to-slate-500 bg-clip-text text-transparent">
+                  SupplySight
+                </h1>
+                <p className="text-xs text-slate-500">Inventory Management</p>
+              </div>
             </div>
-            <DateRangeSelector range={range} setRange={handleRangeChange} />
+            
+            <div className="flex items-center gap-6">
+              <DateRangeSelector range={range} setRange={handleRangeChange} />
+              <button className="p-2 hover:bg-slate-100 rounded-lg transition-colors">
+                <Settings className="w-5 h-5 text-slate-600" />
+              </button>
+            </div>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">Daily Inventory Dashboard</h2>
-          <p className="text-gray-600">Monitor and manage your supply chain inventory in real-time</p>
+     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mb-8 space-y-1">
+          <div className="flex items-center gap-2">
+            <BarChart3 className="w-6 h-6 text-blue-600" />
+            <h2 className="text-2xl font-bold text-slate-800">Daily Inventory Dashboard</h2>
+          </div>
+          <p className="text-slate-500 ml-8">
+            Real-time monitoring and management of your supply chain inventory
+          </p>
         </div>
 
-        {/* KPI Cards */}
-        {loading ? (
-          <KPICardsSkeleton />
-        ) : (
-          <KPICards 
-            totalStock={totalStock}
-            totalDemand={totalDemand} 
-            fillRate={fillRate}
-          />
-        )}
+        {/* Analytics Section */}
+        <div className="space-y-6">
+          {/* KPI Cards with enhanced loading state */}
+          <section>
+            {loading ? <KPICardsSkeleton /> : (
+              <KPICards 
+                totalStock={totalStock}
+                totalDemand={totalDemand} 
+                fillRate={fillRate}
+              />
+            )}
+          </section>
         
-        {/* Trend Chart */}
-       {loading ? (
-          <ChartSkeleton />
-        ) : (
-          <TrendChart 
-            data={kpiData} 
-            range={range}
-          />
-        )}
+       {/* Trend Chart with enhanced loading state */}
+          <section className="rounded-2xl bg-white border border-slate-200 shadow-sm">
+            {loading ? <ChartSkeleton /> : (
+              <TrendChart 
+                data={kpiData} 
+                range={range}
+              />
+            )}
+          </section>
         
         {/* Filters */}
-        <Filters
-          search={filterHook.search}
-          setSearch={filterHook.setSearch}
-          warehouse={filterHook.warehouse}
-          setWarehouse={filterHook.setWarehouse}
-          status={filterHook.status}
-          setStatus={filterHook.setStatus}
-          warehouses={mockWarehouses}
-        />
+       <section className="sticky top-[4.5rem] z-30 pt-4 bg-gradient-to-br from-slate-50 via-white to-blue-50">
+            <Filters
+              search={filterHook.search}
+              setSearch={filterHook.setSearch}
+              warehouse={filterHook.warehouse}
+              setWarehouse={filterHook.setWarehouse}
+              status={filterHook.status}
+              setStatus={filterHook.setStatus}
+              warehouses={mockWarehouses}
+            />
+          </section>
         
         {/* Products Table */}
-        {loading ? (
-          <TableSkeleton />
-        ) : (
-          <ProductsTable
-            products={filterHook.filteredProducts}
-            getProductStatus={getProductStatus}
-            onRowClick={setSelectedProduct}
-            currentPage={filterHook.currentPage}
-            setCurrentPage={filterHook.setCurrentPage}
-          />
-        )}
+         <section className="rounded-2xl overflow-hidden">
+            {loading ? <TableSkeleton /> : (
+              <ProductsTable
+                products={filterHook.filteredProducts}
+                getProductStatus={getProductStatus}
+                onRowClick={setSelectedProduct}
+                currentPage={filterHook.currentPage}
+                setCurrentPage={filterHook.setCurrentPage}
+              />
+            )}
+          </section>
+        </div>
       </main>
 
       {/* Side Drawer */}
-      {selectedProduct && (
+       {selectedProduct && (
         <ProductDrawer 
           product={selectedProduct} 
           onClose={() => setSelectedProduct(null)} 
         />
       )}
+
+
+
+
+       {/* Footer */}
+      <footer className="bg-white border-t border-slate-200 py-4 mt-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center text-sm text-slate-500">
+            SupplySight Dashboard • {new Date().getFullYear()}
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };

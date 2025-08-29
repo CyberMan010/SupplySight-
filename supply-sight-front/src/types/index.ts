@@ -12,6 +12,10 @@ export interface Product {
   warehouse: string;
   stock: number;
   demand: number;
+  price?: number;
+  category?: string;
+  description?: string;
+  image?: string;
 }
 
 export interface KPI {

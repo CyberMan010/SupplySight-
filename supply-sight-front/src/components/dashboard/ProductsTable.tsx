@@ -151,7 +151,7 @@ export const ProductsTable: React.FC<ProductsTableProps> = ({
                   {product.category}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  ${formatNumber(product.price)}
+                  ${typeof product.price === 'number' ? formatNumber(product.price) : '0.00'}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                   {formatNumber(product.stock)}
