@@ -11,6 +11,7 @@ type DrawerTab = 'details' | 'demand' | 'transfer';
 
 export const ProductDrawer: React.FC<ProductDrawerProps> = ({ product, onClose }) => {
   const [activeTab, setActiveTab] = useState<DrawerTab>('details');
+  const [isClosing, setIsClosing] = useState(false);
   const [updateDemandForm, setUpdateDemandForm] = useState<UpdateDemandForm>({
     demand: product.demand
   });
@@ -19,6 +20,14 @@ export const ProductDrawer: React.FC<ProductDrawerProps> = ({ product, onClose }
     toWarehouse: ''
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+
+
+  const handleClose = () => {
+    setIsClosing(true);
+    setTimeout(onClose, 300); 
+  };
+
 
   const handleUpdateDemand = (e: React.FormEvent) => {
     e.preventDefault();
@@ -68,8 +77,20 @@ export const ProductDrawer: React.FC<ProductDrawerProps> = ({ product, onClose }
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden">
-      <div className="absolute inset-0 bg-black bg-opacity-25" onClick={onClose} />
-      <div className="absolute right-0 top-0 h-full w-full max-w-lg bg-white shadow-xl">
+      {/* Backdrop with fade animation */}
+      <div 
+        className={`absolute inset-0 bg-black transition-opacity duration-300 ${
+          isClosing ? 'opacity-0' : 'opacity-25'
+        }`} 
+        onClick={handleClose}
+      />
+
+      {/* Drawer with slide animation */}
+      <div 
+        className={`absolute right-0 top-0 h-full w-full max-w-lg bg-white shadow-xl transform transition-transform duration-300 ease-in-out ${
+          isClosing ? 'translate-x-full' : 'translate-x-0'
+        }`}
+      >
         <div className="flex h-full flex-col">
           {/* Header */}
           <div className="flex items-center justify-between px-6 py-4 bg-gray-50 border-b">
@@ -77,31 +98,47 @@ export const ProductDrawer: React.FC<ProductDrawerProps> = ({ product, onClose }
               <h2 className="text-lg font-semibold text-gray-900">{product.name}</h2>
               <p className="text-sm text-gray-600">{product.id} • {product.sku}</p>
             </div>
-            <Button variant="ghost" size="sm" onClick={onClose}>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={handleClose}
+              className="hover:rotate-90 transition-transform duration-200"
+            >
               <X className="w-5 h-5" />
             </Button>
           </div>
 
-          {/* Tabs */}
-          <div className="flex border-b">
+          {/* Tabs with slide animation */}
+          <div className="flex border-b relative">
             {tabs.map(({ id, label, icon: Icon }) => (
               <button
                 key={id}
                 onClick={() => setActiveTab(id)}
-                className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium transition-colors ${
+                className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium transition-all duration-200 ${
                   activeTab === id
-                    ? 'border-b-2 border-blue-500 text-blue-600 bg-blue-50'
+                    ? 'text-blue-600 bg-blue-50'
                     : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                 }`}
               >
-                <Icon className="w-4 h-4" />
+                <Icon className={`w-4 h-4 transition-transform duration-200 ${
+                  activeTab === id ? 'scale-110' : 'scale-100'
+                }`} />
                 {label}
               </button>
             ))}
+            {/* Animated tab indicator */}
+            <div 
+              className="absolute bottom-0 h-0.5 bg-blue-500 transition-all duration-300 ease-in-out"
+              style={{
+                width: `${100 / tabs.length}%`,
+                left: `${(tabs.findIndex(t => t.id === activeTab) * 100) / tabs.length}%`
+              }}
+            />
           </div>
 
-          {/* Content */}
+          {/* Content with fade animation */}
           <div className="flex-1 overflow-y-auto p-6">
+            <div className={`transition-opacity duration-200 ${isClosing ? 'opacity-0' : 'opacity-100'}`}>
             {activeTab === 'details' && (
               <div className="space-y-6">
                 <div className="grid grid-cols-2 gap-4">
@@ -227,6 +264,7 @@ export const ProductDrawer: React.FC<ProductDrawerProps> = ({ product, onClose }
           </div>
         </div>
       </div>
+    </div>
     </div>
   );
 };
