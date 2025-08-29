@@ -10,34 +10,17 @@ import { ApolloProvider } from "@apollo/client/react";
 const api_Key = import.meta.env.VITE_GRAPHQL_URI;
 
 const client = new ApolloClient({
-  link: from([
-    onError(({ graphQLErrors, networkError }) => {
-      if (graphQLErrors) {
-        graphQLErrors.forEach(({ message, locations, path }) =>
-          console.error(`GraphQL error: ${message}`)
-        );
-      }
-      if (networkError) console.error(`Network error: ${networkError}`);
-    }),
-    new HttpLink({ uri: api_Key || "http://localhost:4000/" })
-  ]),
-  cache: new InMemoryCache({
-    typePolicies: {
-      Product: {
-        keyFields: ['id'],
-        fields: {
-          stock: {
-            merge: true
-          }
-        }
-      }
-    }
-  }),
+  link: new HttpLink({ uri: 'http://localhost:4000' }),
+  cache: new InMemoryCache(),
   defaultOptions: {
     watchQuery: {
-      fetchPolicy: 'cache-and-network',
-      errorPolicy: 'all'
-    }
+      fetchPolicy: 'network-only', // Remove the duplicate fetchPolicy
+      errorPolicy: 'all',
+    },
+    query: {
+      fetchPolicy: 'network-only',
+      errorPolicy: 'all',
+    },
   }
 });
 

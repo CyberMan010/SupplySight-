@@ -54,26 +54,26 @@ let warehouses = [
 const resolvers = {
   Query: {
     products: (_, { search, status, warehouse }) => {
+      console.log('Query received:', { search, status, warehouse }); 
       let result = products;
-
+      
       if (search) {
-        result = result.filter(
-          (p) =>
-            p.name.toLowerCase().includes(search.toLowerCase()) ||
-            p.sku.toLowerCase().includes(search.toLowerCase()) ||
-            p.id.toLowerCase().includes(search.toLowerCase())
+        result = result.filter(p => 
+          p.name.toLowerCase().includes(search.toLowerCase()) ||
+          p.sku.toLowerCase().includes(search.toLowerCase()) ||
+          p.id.toLowerCase().includes(search.toLowerCase())
         );
       }
 
-      if (warehouse) {
-        result = result.filter((p) => p.warehouse === warehouse);
+      if (warehouse && warehouse !== 'All') {
+        result = result.filter(p => p.warehouse === warehouse);
       }
 
-      if (status) {
-        result = result.filter((p) => {
-          if (status === "Healthy") return p.stock > p.demand;
-          if (status === "Low") return p.stock === p.demand;
-          if (status === "Critical") return p.stock < p.demand;
+      if (status && status !== 'All') {
+        result = result.filter(p => {
+          if (status === 'Healthy') return p.stock > p.demand;
+          if (status === 'Low') return p.stock === p.demand;
+          if (status === 'Critical') return p.stock < p.demand;
           return true;
         });
       }
@@ -131,7 +131,12 @@ const resolvers = {
 };
 
 
-const server = new ApolloServer({ typeDefs, resolvers });
+const server = new ApolloServer({   typeDefs, 
+  resolvers,
+  cors: {
+    origin: '*',
+    credentials: true
+  } });
 
 server.listen().then(({ url }) => {
   console.log(`🚀 Mock GraphQL server ready at ${url}`);

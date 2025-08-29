@@ -33,10 +33,14 @@ export const KPI_FRAGMENT = gql`
 
 // Enhanced Queries
 export const GET_PRODUCTS = gql`
-  ${PRODUCT_FRAGMENT}
   query GetProducts($search: String, $status: String, $warehouse: String) {
     products(search: $search, status: $status, warehouse: $warehouse) {
-      ...ProductFragment
+      id
+      name
+      sku
+      warehouse
+      stock
+      demand
     }
   }
 `;

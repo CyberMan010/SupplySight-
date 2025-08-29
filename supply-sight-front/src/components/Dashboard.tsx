@@ -103,9 +103,13 @@ const SupplySightDashboard: React.FC = () => {
       search: '',  // Initial empty search
       status: 'All',  // Initial status
       warehouse: 'All'  // Initial warehouse
-    }
+    },
+    fetchPolicy: 'network-only'
   });
 
+console.log('Loading:', productsLoading);
+console.log('Data:', productsData);
+// console.log('Error:', error);
   const [updateDemand] = useMutation(UPDATE_DEMAND_MUTATION, {
     onCompleted: () => {
       refetch();
@@ -166,11 +170,9 @@ const SupplySightDashboard: React.FC = () => {
   // Refetch when filters change
   useEffect(() => {
     refetch({
-      variables: {
-        search: filterHook.search,
-        status: filterHook.status,
-        warehouse: filterHook.warehouse
-      }
+      search: filterHook.search,
+      status: filterHook.status,
+      warehouse: filterHook.warehouse
     });
   }, [filterHook.search, filterHook.status, filterHook.warehouse, refetch]);
 
