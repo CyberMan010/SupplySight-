@@ -36,9 +36,9 @@ const authLink = setContext((_, { headers }) => {
 });
 
 // Error handling link
-const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) => {
-  if (graphQLErrors) {
-    graphQLErrors.forEach(({ message, locations, path, extensions }) => {
+const errorLink = onError(({ graphqlErrors, networkError, operation, forward }) => {
+  if (graphqlErrors) {
+    graphqlErrors.forEach(({ message, locations, path, extensions }) => {
       console.error(
         `GraphQL error: Message: ${message}, Location: ${locations}, Path: ${path}`
       );
@@ -55,7 +55,7 @@ const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) 
     console.error(`Network error: ${networkError}`);
     
     // Handle network errors
-    if (networkError.statusCode === 401) {
+    if ((networkError as any).statusCode === 401) {
       localStorage.removeItem('authToken');
       window.location.href = '/login';
     }

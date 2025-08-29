@@ -170,7 +170,6 @@ console.log('Data:', productsData);
   // Refetch when filters change
   useEffect(() => {
     refetch({
-
       status: filterHook.status,
       warehouse: filterHook.warehouse
     });
