@@ -13,6 +13,7 @@ import { TrendChart } from '../components/dashboard/TrendCharts';
 import { Filters } from '../components/dashboard/Filters';
 import { ProductsTable } from '../components/dashboard/ProductsTable';
 import { ProductDrawer } from '../components/dashboard/Drawer';
+import { KPICardsSkeleton, ChartSkeleton, TableSkeleton } from './ui/Skeleton';
 
 // Mock data generator for KPIs
 const generateKPIData = (range: DateRange): KPI[] => {
@@ -134,19 +135,25 @@ const SupplySightDashboard: React.FC = () => {
         </div>
 
         {/* KPI Cards */}
-        <KPICards 
-          totalStock={totalStock}
-          totalDemand={totalDemand} 
-          fillRate={fillRate}
-          loading={loading}
-        />
+        {loading ? (
+          <KPICardsSkeleton />
+        ) : (
+          <KPICards 
+            totalStock={totalStock}
+            totalDemand={totalDemand} 
+            fillRate={fillRate}
+          />
+        )}
         
         {/* Trend Chart */}
-        <TrendChart 
-          data={kpiData} 
-          range={range}
-          loading={loading}
-        />
+       {loading ? (
+          <ChartSkeleton />
+        ) : (
+          <TrendChart 
+            data={kpiData} 
+            range={range}
+          />
+        )}
         
         {/* Filters */}
         <Filters
@@ -160,14 +167,17 @@ const SupplySightDashboard: React.FC = () => {
         />
         
         {/* Products Table */}
-        <ProductsTable
-          products={filterHook.filteredProducts}
-          getProductStatus={getProductStatus}
-          onRowClick={setSelectedProduct}
-          currentPage={filterHook.currentPage}
-          setCurrentPage={filterHook.setCurrentPage}
-          loading={loading}
-        />
+        {loading ? (
+          <TableSkeleton />
+        ) : (
+          <ProductsTable
+            products={filterHook.filteredProducts}
+            getProductStatus={getProductStatus}
+            onRowClick={setSelectedProduct}
+            currentPage={filterHook.currentPage}
+            setCurrentPage={filterHook.setCurrentPage}
+          />
+        )}
       </main>
 
       {/* Side Drawer */}
