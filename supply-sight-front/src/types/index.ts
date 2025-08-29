@@ -329,3 +329,50 @@ export const TRANSFER_STOCK_MUTATION = `
     }
   }
 `;
+
+
+
+
+// Query result types
+export interface GetProductsQuery {
+  products: Product[];
+}
+
+export interface GetProductsQueryVariables {
+  search?: string;
+  status?: string;
+  warehouse?: string;
+}
+
+export interface GetWarehousesQuery {
+  warehouses: Warehouse[];
+}
+
+export interface GetKPIsQuery {
+  kpis: KPI[];
+}
+
+export interface GetKPIsQueryVariables {
+  range: string;
+}
+
+// Mutation types
+export interface UpdateDemandMutation {
+  updateDemand: Product;
+}
+
+export interface UpdateDemandMutationVariables {
+  id: string;
+  demand: number;
+}
+
+export interface TransferStockMutation {
+  transferStock: Product;
+}
+
+export interface TransferStockMutationVariables {
+  id: string;
+  from: string;
+  to: string;
+  qty: number;
+}
