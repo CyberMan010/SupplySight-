@@ -1,4 +1,4 @@
-
+const { v4: uuidv4 } = require('uuid');
 const { products, warehouses } = require("./data");
 
 const resolvers = {
@@ -68,12 +68,14 @@ const resolvers = {
       product.stock -= qty;
 
       // Add to target (or create if doesn't exist)
-      let targetProduct = products.find((p) => p.id === id && p.warehouse === to);
-      if (!targetProduct) {
-        targetProduct = { ...product, warehouse: to, stock: 0 };
-        products.push(targetProduct);
-      }
-      targetProduct.stock += qty;
+       let targetProduct = products.find((p) => p.id === id && p.warehouse === to);
+    if (!targetProduct) {
+      // Generate a new unique id for the target product
+      const newId = `${id}-${to}-${Date.now()}`; // Or use uuidv4()
+      targetProduct = { ...product, id: newId, warehouse: to, stock: 0 };
+      products.push(targetProduct);
+    }
+    targetProduct.stock += qty;
 
       return product;
     }
