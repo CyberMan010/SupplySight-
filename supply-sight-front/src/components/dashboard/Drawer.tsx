@@ -17,6 +17,7 @@ export const ProductDrawer: React.FC<ProductDrawerProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState<DrawerTab>('details');
   const [isClosing, setIsClosing] = useState(false);
+  const [showToast, setShowToast] = useState(false);
   const [updateDemandForm, setUpdateDemandForm] = useState<UpdateDemandForm>({
     demand: product.demand
   });
@@ -32,6 +33,9 @@ export const ProductDrawer: React.FC<ProductDrawerProps> = ({
     setIsClosing(true);
     setTimeout(onClose, 300); 
   };
+
+
+  
 
 
   const handleUpdateDemand = async (e: React.FormEvent) => {
@@ -65,6 +69,10 @@ export const ProductDrawer: React.FC<ProductDrawerProps> = ({
         [error.field]: error.message
       }), {});
       setErrors(errorMap);
+       if (validationErrors.some(err => err.field === 'toWarehouse')) {
+        setShowToast(true);
+        setTimeout(() => setShowToast(false), 2500);
+      }
       return;
     }
     
@@ -91,6 +99,11 @@ export const ProductDrawer: React.FC<ProductDrawerProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden">
+       {showToast && (
+        <div className="fixed top-6 right-6 z-50 bg-red-600 text-white px-4 py-2 rounded shadow-lg transition-opacity duration-300">
+          Please select a destination warehouse before transferring stock.
+        </div>
+      )}
       {/* Backdrop with fade animation */}
       <div 
         className={`absolute inset-0 bg-black transition-opacity duration-300 ${
@@ -226,7 +239,18 @@ export const ProductDrawer: React.FC<ProductDrawerProps> = ({
             )}
 
             {activeTab === 'transfer' && (
-              <form onSubmit={handleTransferStock} className="space-y-6">
+              <form
+                onSubmit={(e) => {
+                  if (!transferStockForm.toWarehouse) {
+                    e.preventDefault();
+                    setShowToast(true);
+                    setTimeout(() => setShowToast(false), 2500);
+                    return;
+                  }
+                  handleTransferStock(e);
+                }}
+                className="space-y-6"
+              >
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Transfer Quantity
@@ -266,10 +290,9 @@ export const ProductDrawer: React.FC<ProductDrawerProps> = ({
                     <p className="text-sm text-red-600 mt-1">{errors.toWarehouse}</p>
                   )}
                 </div>
-                <Button 
-                  type="submit" 
-                  className="w-full" 
-                  disabled={!transferStockForm.quantity || !transferStockForm.toWarehouse}
+                <Button
+                  type="submit"
+                  className={`w-full ${(!transferStockForm.quantity || !transferStockForm.toWarehouse) ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
                   Transfer Stock
                 </Button>
