@@ -59,34 +59,37 @@ export const ProductDrawer: React.FC<ProductDrawerProps> = ({
     }
   };
 
-  const handleTransferStock = async (e: React.FormEvent) => {
+   const handleTransferStock = async (e: React.FormEvent) => {
     e.preventDefault();
     const validationErrors = validateTransferStock(transferStockForm, product);
-    
+
     if (validationErrors.length > 0) {
       const errorMap = validationErrors.reduce((acc, error) => ({
         ...acc,
         [error.field]: error.message
       }), {});
       setErrors(errorMap);
-       if (validationErrors.some(err => err.field === 'toWarehouse')) {
+      if (validationErrors.some(err => err.field === 'toWarehouse')) {
         setShowToast(true);
         setTimeout(() => setShowToast(false), 2500);
       }
       return;
     }
-    
+
     setErrors({});
     try {
       await onTransferStock(
-        product.id, 
-        product.warehouse, 
-        transferStockForm.toWarehouse, 
+        product.id,
+        product.warehouse,
+        transferStockForm.toWarehouse,
         transferStockForm.quantity
       );
-    } catch (error) {
-      setErrors({ quantity: 'Failed to transfer stock. Please try again.' });
-    }
+    setTimeout(() => {
+      onClose(); // Close drawer after toast
+    }, 2500);
+  } catch (error) {
+    setErrors({ quantity: 'Failed to transfer stock. Please try again.' });
+  }
   };
 
   const utilizationPercentage = (product.demand / product.stock) * 100;
@@ -104,6 +107,7 @@ export const ProductDrawer: React.FC<ProductDrawerProps> = ({
           Please select a destination warehouse before transferring stock.
         </div>
       )}
+     
       {/* Backdrop with fade animation */}
       <div 
         className={`absolute inset-0 bg-black transition-opacity duration-300 ${
