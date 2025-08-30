@@ -1,5 +1,6 @@
 const { v4: uuidv4 } = require('uuid');
 const { products, warehouses } = require("./data");
+const newId = uuidv4();
 
 const resolvers = {
   Query: {

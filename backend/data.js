@@ -18,7 +18,7 @@ let products = [
   { id: "P-1016", name: "Square Nut", sku: "SQR-NUT-10", warehouse: "DEL-B", stock: 65, demand: 70 },
   { id: "P-1017", name: "T-Nut", sku: "T-NUT-08", warehouse: "BLR-A", stock: 85, demand: 90 },
   { id: "P-1018", name: "Dome Nut", sku: "DOME-NUT-10", warehouse: "PNQ-C", stock: 45, demand: 50 },
-  { id: "P-1019", name: "Eye Bolt", sku: "EYE-BOLT-12", warehouse: "DEL-B", stock: 25, demand: 30 }
+  { id: "P-1019", name: "Eye Bolt", sku: "EYE-BOLT-12", category: "steel", warehouse: "DEL-B", stock: 25, demand: 30 }
 ];
 
 let warehouses = [

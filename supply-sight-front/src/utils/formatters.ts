@@ -15,13 +15,13 @@ export const formatDate = (
   const { format = 'short', locale = 'en-US' } = options;
   const dateObj = typeof date === 'string' ? new Date(date) : date;
   
-  const formatOptions: Intl.DateTimeFormatOptions = {
+  const formatMap: Record<'short' | 'long' | 'numeric', Intl.DateTimeFormatOptions> = {
     short: { month: 'short', day: 'numeric' },
     long: { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' },
     numeric: { year: 'numeric', month: '2-digit', day: '2-digit' }
   };
-  
-  return new Intl.DateTimeFormat(locale, formatOptions[format]).format(dateObj);
+
+  return new Intl.DateTimeFormat(locale, formatMap[format]).format(dateObj);
 };
 
 export const formatPercentage = (value: number, decimals: number = 1): string => {
